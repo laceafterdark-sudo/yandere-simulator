@@ -105,37 +105,63 @@
             });
             const blobUrl = URL.createObjectURL(blob);
 
-            const gameInstance = UnityLoader.instantiate("unityContainer", json, {
-                url: blobUrl,
-                Module: {
-                    onRuntimeInitialized: () => {
-                        const loadingText = document.querySelector("#loading-text");
-                        if (loadingText) loadingText.remove();
-                    },
-                },
-            });
+const gameInstance = UnityLoader.instantiate("unityContainer", json, {
+    url: blobUrl,
+    Module: {
+        onRuntimeInitialized: () => {
+            const loadingText = document.querySelector("#loading-text");
+            if (loadingText) loadingText.remove();
 
-            const resize = () => {
-                const container = document.getElementById("unityContainer");
-                container.style.width = window.innerWidth + "px";
-                container.style.height = window.innerHeight + "px";
-            };
-            window.addEventListener("resize", resize);
-            resize();
-        });
+            reportGameRatio();
+        },
+    },
+});
+
+function reportGameRatio() {
+    const canvas = document.querySelector("#unityContainer canvas");
+
+    if (canvas && canvas.width > 0 && canvas.height > 0) {
+        window.parent.postMessage({
+            type: "arcade-game-size",
+            width: canvas.width,
+            height: canvas.height
+        }, "*");
+    }
+}
+
+const resize = () => {
+    const container = document.getElementById("unityContainer");
+    container.style.width = window.innerWidth + "px";
+    container.style.height = window.innerHeight + "px";
+
+    reportGameRatio();
+};
+
+window.addEventListener("resize", resize);
+resize();
+
+const ratioTimer = setInterval(() => {
+    const canvas = document.querySelector("#unityContainer canvas");
+
+    if (canvas && canvas.width > 0 && canvas.height > 0) {
+        reportGameRatio();
+        clearInterval(ratioTimer);
+    }
+}, 1000);
     </script>
 </head>
 
 <body>
     <div id="loading-text" style="
-					color: white;
-					font-size: 48px;
-					font-family: 'Comic Sans MS', cursive;
-					text-align: center;
-					margin-top: 20px;
-				">
+        color: white;
+        font-size: 48px;
+        font-family: 'Comic Sans MS', cursive;
+        text-align: center;
+        margin-top: 20px;
+    ">
         LOADING...
-    </div>LOADING...</div>
+    </div>
+
     <div id="unityContainer"></div>
 </body>
 
