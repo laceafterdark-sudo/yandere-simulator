@@ -111,43 +111,18 @@ const gameInstance = UnityLoader.instantiate("unityContainer", json, {
         onRuntimeInitialized: () => {
             const loadingText = document.querySelector("#loading-text");
             if (loadingText) loadingText.remove();
-
-            reportGameRatio();
         },
     },
 });
-
-function reportGameRatio() {
-    const canvas = document.querySelector("#unityContainer canvas");
-
-    if (canvas && canvas.width > 0 && canvas.height > 0) {
-        window.parent.postMessage({
-            type: "arcade-game-size",
-            width: canvas.width,
-            height: canvas.height
-        }, "*");
-    }
-}
 
 const resize = () => {
     const container = document.getElementById("unityContainer");
     container.style.width = window.innerWidth + "px";
     container.style.height = window.innerHeight + "px";
-
-    reportGameRatio();
 };
 
 window.addEventListener("resize", resize);
 resize();
-
-const ratioTimer = setInterval(() => {
-    const canvas = document.querySelector("#unityContainer canvas");
-
-    if (canvas && canvas.width > 0 && canvas.height > 0) {
-        reportGameRatio();
-        clearInterval(ratioTimer);
-    }
-}, 1000);
 
 }); // Closes the Promise.then() function
 </script>
